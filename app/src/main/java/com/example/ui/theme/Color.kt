@@ -1,0 +1,63 @@
+package com.example.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+// Serene Oasis Light Tokens (from design specification)
+val OasisSurface = Color(0xFFFCF9F8)
+val OasisSurfaceDim = Color(0xFFDCD9D9)
+val OasisSurfaceBright = Color(0xFFFCF9F8)
+val OasisSurfaceContainerLowest = Color(0xFFFFFFFF)
+val OasisSurfaceContainerLow = Color(0xFFF6F3F2)
+val OasisSurfaceContainer = Color(0xFFF0EDED)
+val OasisSurfaceContainerHigh = Color(0xFFEAE7E7)
+val OasisSurfaceContainerHighest = Color(0xFFE4E2E1)
+val OasisOnSurface = Color(0xFF1B1C1C)
+val OasisOnSurfaceVariant = Color(0xFF44483F)
+val OasisInverseSurface = Color(0xFF303030)
+val OasisInverseOnSurface = Color(0xFFF3F0F0)
+val OasisOutline = Color(0xFF75786E)
+val OasisOutlineVariant = Color(0xFFC5C8BC)
+
+val OasisPrimary = Color(0xFF526442)
+val OasisOnPrimary = Color(0xFFFFFFFF)
+val OasisPrimaryContainer = Color(0xFF9CAF88)
+val OasisOnPrimaryContainer = Color(0xFF324224)
+val OasisInversePrimary = Color(0xFFB9CDA4)
+
+val OasisSecondary = Color(0xFF735C00)
+val OasisOnSecondary = Color(0xFFFFFFFF)
+val OasisSecondaryContainer = Color(0xFFFED65B)
+val OasisOnSecondaryContainer = Color(0xFF745C00)
+
+val OasisTertiary = Color(0xFF615E57)
+val OasisOnTertiary = Color(0xFFFFFFFF)
+val OasisTertiaryContainer = Color(0xFFACA89F)
+val OasisOnTertiaryContainer = Color(0xFF3F3D37)
+
+val OasisError = Color(0xFFBA1A1A)
+val OasisOnError = Color(0xFFFFFFFF)
+val OasisErrorContainer = Color(0xFFFFDAD6)
+val OasisOnErrorContainer = Color(0xFF93000A)
+
+// Brand signature accents
+val WarmCream = Color(0xFFF5F0E6)
+val SageGreen = Color(0xFF9CAF88)
+val RefinedGold = Color(0xFFD4AF37)
+val DeepCharcoal = Color(0xFF2C2C2C)
+val SoftGoldBg = Color(0xFFFFF6DB)
+val SoftSageTint = Color(0xFFEBF1E4)
+
+// Dark Sanctuary Palette (graceful dark mode support)
+val DarkSurface = Color(0xFF141613)
+val DarkSurfaceContainerLow = Color(0xFF1B1E19)
+val DarkSurfaceContainer = Color(0xFF21251F)
+val DarkSurfaceContainerHigh = Color(0xFF2B3028)
+val DarkOnSurface = Color(0xFFECEAE4)
+val DarkOnSurfaceVariant = Color(0xFFC4C8BC)
+val DarkPrimary = Color(0xFFB9CDA4)
+val DarkOnPrimary = Color(0xFF243318)
+val DarkPrimaryContainer = Color(0xFF3B4C2C)
+val DarkOnPrimaryContainer = Color(0xFFD5E9BF)
+val DarkSecondary = Color(0xFFE9C349)
+val DarkSecondaryContainer = Color(0xFF574500)
+val DarkOnSecondaryContainer = Color(0xFFFFE088)

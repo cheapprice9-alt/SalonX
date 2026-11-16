@@ -1,0 +1,62 @@
+<resources>
+    <string name="app_name">SalonX</string>
+
+    <!-- Auth Screen -->
+    <string name="auth_brand_name">SALONX</string>
+    <string name="auth_brand_tagline">STYLE  •  BEAUTY  •  GLAMOUR</string>
+    <string name="auth_hero_headline">Your Beauty,\nOur Expertise.</string>
+    <string name="auth_hero_subtitle">Discover premium salons, spas, and beauty parlours near you. Book appointments in seconds.</string>
+    <string name="auth_get_started">Get Started</string>
+    <string name="auth_sign_in">Sign In</string>
+    <string name="auth_own_salon_prompt">Own a salon? </string>
+    <string name="auth_register_salon_owner">Register as Salon Owner</string>
+    <string name="auth_entering_sanctuary">Signing in…</string>
+    <string name="auth_register_google">Continue with Google</string>
+    <string name="auth_badge_sanctuary">PRIVATE WELLNESS SANCTUARY</string>
+    <string name="auth_tagline">Restorative botanical rituals, master therapists, and unhurried calm.</string>
+    <string name="auth_tab_sign_in">Sign In</string>
+    <string name="auth_tab_register">Create Account</string>
+    <string name="auth_sign_in_google">Sign in with Google</string>
+    <string name="auth_privacy_note">Secured with Firebase Authentication &amp; Google Sign-In.</string>
+
+    <!-- Navigation -->
+    <string name="nav_sanctuary">Sanctuary</string>
+    <string name="nav_treatments">Treatments</string>
+    <string name="nav_bookings">Appointments</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Appointments Screen -->
+    <string name="appointments_title">My Appointments</string>
+    <string name="appointments_subtitle">Upcoming &amp; past visits synced from Firestore</string>
+    <string name="appointments_syncing">Loading your appointments…</string>
+    <string name="appointments_retry">Try Again</string>
+    <string name="appointments_book_again">Book Again</string>
+
+    <!-- Business Insights Screen -->
+    <string name="insights_title">Business Insights</string>
+
+    <!-- Smart Booking Assistant -->
+    <string name="assistant_title">Smart Booking Assistant</string>
+    <string name="assistant_subtitle">Personalized rituals by mood &amp; skin type</string>
+    <string name="assistant_input_hint">Tell me your mood or skin needs…</string>
+    <string name="assistant_new_chat">New conversation</string>
+    <string name="assistant_send">Send message</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_sanctuary_hero">SalonX luxury spa and salon suite</string>
+    <string name="cd_back">Navigate back</string>
+    <string name="cd_favorite">Toggle favorite treatment</string>
+    <string name="cd_search">Search treatments</string>
+    <string name="cd_clear_search">Clear search</string>
+
+    <!-- Actions & Common -->
+    <string name="action_explore_ritual">Explore Ritual</string>
+    <string name="action_reserve_ritual">Reserve Ritual</string>
+    <string name="action_confirm_reservation">Confirm Reservation</string>
+    <string name="action_view_bookings">View My Bookings</string>
+    <string name="action_browse_treatments">Browse Treatments</string>
+    <string name="action_reschedule">Reschedule</string>
+    <string name="action_cancel_ritual">Cancel Ritual</string>
+    <string name="action_save_preferences">Save Preferences</string>
+    <string name="action_sign_out">Sign Out</string>
+</resources>

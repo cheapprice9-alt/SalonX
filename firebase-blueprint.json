@@ -1,0 +1,364 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Sanctuary member profile, wellness preferences, points balance, referral tracking, and favorite treatment IDs.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase user UID."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Member display name."
+        },
+        "email": {
+          "type": "string",
+          "description": "Optional member email address."
+        },
+        "membershipTier": {
+          "type": "string",
+          "enum": ["SANCTUARY_GUEST", "SAGE_MEMBER", "GOLD_SANCTUARY"],
+          "description": "Member sanctuary tier."
+        },
+        "wellnessPoints": {
+          "type": "integer",
+          "description": "Accumulated sanctuary wellness points."
+        },
+        "preferredPressure": {
+          "type": "string",
+          "enum": ["Gentle", "Medium", "Firm", "Deep"],
+          "description": "Preferred massage pressure level."
+        },
+        "aromatherapyNote": {
+          "type": "string",
+          "description": "Optional preferred essential oil blend note."
+        },
+        "favoriteTreatmentIds": {
+          "type": "array",
+          "description": "Bounded list of favorited treatment IDs (max 30)."
+        },
+        "referralCode": {
+          "type": "string",
+          "description": "Unique generated SalonX referral code for inviting new users."
+        },
+        "claimedReferralPoints": {
+          "type": "integer",
+          "description": "Cumulative referral reward points synced into wellnessPoints."
+        },
+        "redeemedReferralCode": {
+          "type": "string",
+          "description": "Referral code redeemed once by this user when joining."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation server timestamp (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update server timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "displayName",
+        "membershipTier",
+        "wellnessPoints",
+        "preferredPressure",
+        "favoriteTreatmentIds",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "SpaBooking": {
+      "title": "SpaBooking",
+      "description": "A reserved spa treatment or sanctuary package appointment for an authenticated member.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase user UID."
+        },
+        "treatmentId": {
+          "type": "string",
+          "description": "Catalog ID of the selected treatment or package."
+        },
+        "treatmentTitle": {
+          "type": "string",
+          "description": "Display title of the booked treatment."
+        },
+        "treatmentCategory": {
+          "type": "string",
+          "description": "Category label of the booked treatment."
+        },
+        "therapistId": {
+          "type": "string",
+          "description": "Assigned master therapist ID."
+        },
+        "therapistName": {
+          "type": "string",
+          "description": "Assigned master therapist display name."
+        },
+        "dateLabel": {
+          "type": "string",
+          "description": "Formatted date label for display."
+        },
+        "dateIso": {
+          "type": "string",
+          "description": "ISO date string (YYYY-MM-DD)."
+        },
+        "timeSlot": {
+          "type": "string",
+          "description": "Selected appointment time slot."
+        },
+        "durationMinutes": {
+          "type": "integer",
+          "description": "Total ritual duration in minutes."
+        },
+        "priceUsd": {
+          "type": "integer",
+          "description": "Total price in USD."
+        },
+        "addOns": {
+          "type": "array",
+          "description": "Selected ritual enhancements (max 10)."
+        },
+        "specialRequests": {
+          "type": "string",
+          "description": "Optional guest notes or sensory requests."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["confirmed", "completed", "cancelled"],
+          "description": "Current appointment status."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation server timestamp (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update server timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "treatmentId",
+        "treatmentTitle",
+        "treatmentCategory",
+        "therapistId",
+        "therapistName",
+        "dateLabel",
+        "dateIso",
+        "timeSlot",
+        "durationMinutes",
+        "priceUsd",
+        "addOns",
+        "specialRequests",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ServiceReview": {
+      "title": "ServiceReview",
+      "description": "Customer rating and written feedback for a completed appointment, linked to a treatment service and/or staff specialist.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Author Firebase user UID."
+        },
+        "bookingId": {
+          "type": "string",
+          "description": "Completed booking document ID being reviewed."
+        },
+        "targetType": {
+          "type": "string",
+          "enum": ["SERVICE", "STAFF", "BOTH"],
+          "description": "Specifies whether the review targets the service, staff member, or both."
+        },
+        "treatmentId": {
+          "type": "string",
+          "description": "Linked spa treatment catalog ID."
+        },
+        "treatmentTitle": {
+          "type": "string",
+          "description": "Display title of the reviewed treatment."
+        },
+        "therapistId": {
+          "type": "string",
+          "description": "Linked staff specialist ID."
+        },
+        "therapistName": {
+          "type": "string",
+          "description": "Linked staff specialist display name."
+        },
+        "rating": {
+          "type": "integer",
+          "description": "Star rating from 1 to 5."
+        },
+        "comment": {
+          "type": "string",
+          "description": "Customer written review feedback (1 to 500 characters)."
+        },
+        "reviewerName": {
+          "type": "string",
+          "description": "Display name of the customer leaving the review."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation server timestamp (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update server timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "bookingId",
+        "targetType",
+        "treatmentId",
+        "treatmentTitle",
+        "therapistId",
+        "therapistName",
+        "rating",
+        "comment",
+        "reviewerName",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ReferralCodeRecord": {
+      "title": "ReferralCodeRecord",
+      "description": "Unique referral code entry tracking total successful referrals and loyalty points earned.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Unique SALONX-XXXXXX code string."
+        },
+        "ownerUid": {
+          "type": "string",
+          "description": "Referrer Firebase UID."
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "Referrer display name."
+        },
+        "successfulReferrals": {
+          "type": "integer",
+          "description": "Number of new users who successfully redeemed this code."
+        },
+        "pointsEarned": {
+          "type": "integer",
+          "description": "Total referrer loyalty points earned via this code."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation server timestamp (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update server timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "code",
+        "ownerUid",
+        "ownerName",
+        "successfulReferrals",
+        "pointsEarned",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ReferralRedemption": {
+      "title": "ReferralRedemption",
+      "description": "Immutable 1-time receipt keyed by referee UID recording a successful friend referral and loyalty bonuses.",
+      "type": "object",
+      "properties": {
+        "refereeUid": {
+          "type": "string",
+          "description": "Invited new user UID."
+        },
+        "refereeName": {
+          "type": "string",
+          "description": "Invited friend's display name."
+        },
+        "referrerUid": {
+          "type": "string",
+          "description": "Referring member's UID."
+        },
+        "referralCode": {
+          "type": "string",
+          "description": "Redeemed referral code."
+        },
+        "rewardPointsReferrer": {
+          "type": "integer",
+          "description": "Loyalty points credited to referrer (150)."
+        },
+        "rewardPointsReferee": {
+          "type": "integer",
+          "description": "Welcome bonus points credited to invited friend (100)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Redemption server timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "refereeUid",
+        "refereeName",
+        "referrerUid",
+        "referralCode",
+        "rewardPointsReferrer",
+        "rewardPointsReferee",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Authenticated user's Serene Oasis member profile and preferences."
+    },
+    "/users/{userId}/bookings/{bookingId}": {
+      "schema": {
+        "$ref": "#/entities/SpaBooking"
+      },
+      "description": "Authenticated user's spa appointment bookings."
+    },
+    "/users/{userId}/reviews/{reviewId}": {
+      "schema": {
+        "$ref": "#/entities/ServiceReview"
+      },
+      "description": "Authenticated user's ratings and feedback for completed appointments linked to services and staff."
+    },
+    "/referral_codes/{code}": {
+      "schema": {
+        "$ref": "#/entities/ReferralCodeRecord"
+      },
+      "description": "Direct-lookup referral code registry tracking successful referrals and points."
+    },
+    "/referral_redemptions/{refereeUid}": {
+      "schema": {
+        "$ref": "#/entities/ReferralRedemption"
+      },
+      "description": "Immutable per-user referral redemption receipt linking referrer and referee."
+    }
+  }
+}

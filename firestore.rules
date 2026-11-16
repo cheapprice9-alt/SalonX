@@ -1,0 +1,274 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidReferralCode(code) {
+      return code is string && code.matches('^SALONX-[A-Z0-9]{6}$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidUserProfile(data) {
+      return data.userId is string && isValidId(data.userId) &&
+             data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 80 &&
+             (!('email' in data) || data.email == null || (data.email is string && data.email.size() <= 120)) &&
+             data.membershipTier in ['SANCTUARY_GUEST', 'SAGE_MEMBER', 'GOLD_SANCTUARY'] &&
+             data.wellnessPoints is int && data.wellnessPoints >= 0 && data.wellnessPoints <= 1000000 &&
+             data.preferredPressure in ['Gentle', 'Medium', 'Firm', 'Deep'] &&
+             (!('aromatherapyNote' in data) || data.aromatherapyNote == null || (data.aromatherapyNote is string && data.aromatherapyNote.size() <= 200)) &&
+             data.favoriteTreatmentIds is list && data.favoriteTreatmentIds.size() <= 30 &&
+             (data.favoriteTreatmentIds.size() == 0 || data.favoriteTreatmentIds[0] is string) &&
+             (!('referralCode' in data) || isValidReferralCode(data.referralCode)) &&
+             (!('claimedReferralPoints' in data) || (data.claimedReferralPoints is int && data.claimedReferralPoints >= 0 && data.claimedReferralPoints <= 1000000)) &&
+             (!('redeemedReferralCode' in data) || data.redeemedReferralCode == null || isValidReferralCode(data.redeemedReferralCode));
+    }
+
+    function isValidBooking(data) {
+      return data.userId is string && isValidId(data.userId) &&
+             data.treatmentId is string && isValidId(data.treatmentId) &&
+             data.treatmentTitle is string && data.treatmentTitle.size() >= 1 && data.treatmentTitle.size() <= 120 &&
+             data.treatmentCategory is string && data.treatmentCategory.size() >= 1 && data.treatmentCategory.size() <= 60 &&
+             data.therapistId is string && isValidId(data.therapistId) &&
+             data.therapistName is string && data.therapistName.size() >= 1 && data.therapistName.size() <= 80 &&
+             data.dateLabel is string && data.dateLabel.size() >= 1 && data.dateLabel.size() <= 40 &&
+             data.dateIso is string && data.dateIso.size() >= 1 && data.dateIso.size() <= 20 &&
+             data.timeSlot is string && data.timeSlot.size() >= 1 && data.timeSlot.size() <= 20 &&
+             data.durationMinutes is int && data.durationMinutes >= 15 && data.durationMinutes <= 300 &&
+             data.priceUsd is int && data.priceUsd >= 1 && data.priceUsd <= 10000 &&
+             data.addOns is list && data.addOns.size() <= 10 &&
+             (data.addOns.size() == 0 || data.addOns[0] is string) &&
+             data.specialRequests is string && data.specialRequests.size() <= 300 &&
+             data.status in ['confirmed', 'completed', 'cancelled'];
+    }
+
+    function isValidReview(data) {
+      return data.userId is string && isValidId(data.userId) &&
+             data.bookingId is string && isValidId(data.bookingId) &&
+             data.targetType in ['SERVICE', 'STAFF', 'BOTH'] &&
+             data.treatmentId is string && isValidId(data.treatmentId) &&
+             data.treatmentTitle is string && data.treatmentTitle.size() >= 1 && data.treatmentTitle.size() <= 120 &&
+             data.therapistId is string && isValidId(data.therapistId) &&
+             data.therapistName is string && data.therapistName.size() >= 1 && data.therapistName.size() <= 80 &&
+             data.rating is int && data.rating >= 1 && data.rating <= 5 &&
+             data.comment is string && data.comment.size() >= 1 && data.comment.size() <= 500 &&
+             data.reviewerName is string && data.reviewerName.size() >= 1 && data.reviewerName.size() <= 80;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false;
+
+      allow create: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().keys().hasAll(['userId', 'displayName', 'membershipTier', 'wellnessPoints', 'preferredPressure', 'favoriteTreatmentIds', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'displayName', 'email', 'membershipTier', 'wellnessPoints', 'preferredPressure', 'aromatherapyNote', 'favoriteTreatmentIds', 'referralCode', 'claimedReferralPoints', 'createdAt', 'updatedAt']) &&
+                       incoming().createdAt is timestamp &&
+                       incoming().createdAt <= request.time &&
+                       incoming().updatedAt is timestamp &&
+                       incoming().updatedAt <= request.time &&
+                       isValidUserProfile(incoming());
+
+      allow update: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       isValidUserProfile(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().updatedAt is timestamp &&
+                       incoming().updatedAt <= request.time &&
+                       (
+                         incoming().diff(existing()).affectedKeys().hasOnly(['favoriteTreatmentIds', 'updatedAt']) ||
+                         incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'preferredPressure', 'aromatherapyNote', 'updatedAt']) ||
+                         incoming().diff(existing()).affectedKeys().hasOnly(['wellnessPoints', 'membershipTier', 'updatedAt']) ||
+                         (
+                           incoming().diff(existing()).affectedKeys().hasOnly(['referralCode', 'claimedReferralPoints', 'updatedAt']) &&
+                           !('referralCode' in existing()) &&
+                           isValidReferralCode(incoming().referralCode) &&
+                           incoming().claimedReferralPoints == 0
+                         ) ||
+                         (
+                           incoming().diff(existing()).affectedKeys().hasOnly(['wellnessPoints', 'membershipTier', 'claimedReferralPoints', 'updatedAt']) &&
+                           ('referralCode' in existing()) &&
+                           incoming().claimedReferralPoints is int &&
+                           incoming().claimedReferralPoints > existing().get('claimedReferralPoints', 0) &&
+                           get(/databases/$(database)/documents/referral_codes/$(existing().referralCode)).data.pointsEarned >= incoming().claimedReferralPoints &&
+                           (incoming().wellnessPoints - existing().wellnessPoints) == (incoming().claimedReferralPoints - existing().get('claimedReferralPoints', 0))
+                         ) ||
+                         (
+                           incoming().diff(existing()).affectedKeys().hasOnly(['wellnessPoints', 'membershipTier', 'redeemedReferralCode', 'updatedAt']) &&
+                           !('redeemedReferralCode' in existing()) &&
+                           isValidReferralCode(incoming().redeemedReferralCode) &&
+                           !exists(/databases/$(database)/documents/referral_redemptions/$(userId)) &&
+                           existsAfter(/databases/$(database)/documents/referral_redemptions/$(userId)) &&
+                           (incoming().wellnessPoints - existing().wellnessPoints) == 100
+                         )
+                       );
+
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      match /bookings/{bookingId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(bookingId);
+        allow list: if isOwner(userId) && isValidId(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(userId) &&
+                         isValidId(bookingId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().status == 'confirmed' &&
+                         incoming().keys().hasAll(['userId', 'treatmentId', 'treatmentTitle', 'treatmentCategory', 'therapistId', 'therapistName', 'dateLabel', 'dateIso', 'timeSlot', 'durationMinutes', 'priceUsd', 'addOns', 'specialRequests', 'status', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'treatmentId', 'treatmentTitle', 'treatmentCategory', 'therapistId', 'therapistName', 'dateLabel', 'dateIso', 'timeSlot', 'durationMinutes', 'priceUsd', 'addOns', 'specialRequests', 'status', 'createdAt', 'updatedAt']) &&
+                         incoming().createdAt is timestamp &&
+                         incoming().createdAt <= request.time &&
+                         incoming().updatedAt is timestamp &&
+                         incoming().updatedAt <= request.time &&
+                         isValidBooking(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(userId) &&
+                         isValidId(bookingId) &&
+                         isValidBooking(incoming()) &&
+                         existing().status == 'confirmed' &&
+                         incoming().userId == existing().userId &&
+                         incoming().treatmentId == existing().treatmentId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().updatedAt is timestamp &&
+                         incoming().updatedAt <= request.time &&
+                         (
+                           (incoming().status == 'confirmed' && incoming().diff(existing()).affectedKeys().hasOnly(['dateLabel', 'dateIso', 'timeSlot', 'specialRequests', 'updatedAt'])) ||
+                           (incoming().status == 'cancelled' && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']))
+                         );
+
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(bookingId);
+      }
+
+      match /reviews/{reviewId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(reviewId);
+        allow list: if isOwner(userId) && isValidId(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(userId) &&
+                         isValidId(reviewId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().bookingId == reviewId &&
+                         incoming().keys().hasAll(['userId', 'bookingId', 'targetType', 'treatmentId', 'treatmentTitle', 'therapistId', 'therapistName', 'rating', 'comment', 'reviewerName', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'bookingId', 'targetType', 'treatmentId', 'treatmentTitle', 'therapistId', 'therapistName', 'rating', 'comment', 'reviewerName', 'createdAt', 'updatedAt']) &&
+                         incoming().createdAt is timestamp &&
+                         incoming().createdAt <= request.time &&
+                         incoming().updatedAt is timestamp &&
+                         incoming().updatedAt <= request.time &&
+                         isValidReview(incoming()) &&
+                         exists(/databases/$(database)/documents/users/$(userId)/bookings/$(reviewId)) &&
+                         get(/databases/$(database)/documents/users/$(userId)/bookings/$(reviewId)).data.status != 'cancelled';
+
+        allow update: if isOwner(userId) &&
+                         isValidId(userId) &&
+                         isValidId(reviewId) &&
+                         isValidReview(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().bookingId == existing().bookingId &&
+                         incoming().treatmentId == existing().treatmentId &&
+                         incoming().therapistId == existing().therapistId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().updatedAt is timestamp &&
+                         incoming().updatedAt <= request.time &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['targetType', 'rating', 'comment', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(reviewId);
+      }
+    }
+
+    match /referral_codes/{code} {
+      allow get: if isSignedIn() && isValidReferralCode(code);
+      allow list: if false;
+
+      allow create: if isSignedIn() &&
+                       isValidReferralCode(code) &&
+                       incoming().code == code &&
+                       incoming().ownerUid == request.auth.uid &&
+                       incoming().ownerName is string &&
+                       incoming().ownerName.size() >= 1 &&
+                       incoming().ownerName.size() <= 80 &&
+                       incoming().successfulReferrals is int &&
+                       incoming().successfulReferrals == 0 &&
+                       incoming().pointsEarned is int &&
+                       incoming().pointsEarned == 0 &&
+                       incoming().keys().hasAll(['code', 'ownerUid', 'ownerName', 'successfulReferrals', 'pointsEarned', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['code', 'ownerUid', 'ownerName', 'successfulReferrals', 'pointsEarned', 'createdAt', 'updatedAt']) &&
+                       incoming().createdAt is timestamp &&
+                       incoming().createdAt <= request.time &&
+                       incoming().updatedAt is timestamp &&
+                       incoming().updatedAt <= request.time;
+
+      allow update: if isSignedIn() &&
+                       isValidReferralCode(code) &&
+                       request.auth.uid != existing().ownerUid &&
+                       incoming().ownerUid == existing().ownerUid &&
+                       incoming().code == existing().code &&
+                       incoming().ownerName == existing().ownerName &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['successfulReferrals', 'pointsEarned', 'updatedAt']) &&
+                       incoming().successfulReferrals is int &&
+                       incoming().successfulReferrals == existing().successfulReferrals + 1 &&
+                       incoming().pointsEarned is int &&
+                       incoming().pointsEarned == existing().pointsEarned + 150 &&
+                       incoming().updatedAt is timestamp &&
+                       incoming().updatedAt <= request.time &&
+                       !exists(/databases/$(database)/documents/referral_redemptions/$(request.auth.uid)) &&
+                       existsAfter(/databases/$(database)/documents/referral_redemptions/$(request.auth.uid));
+
+      allow delete: if isSignedIn() && existing().ownerUid == request.auth.uid;
+    }
+
+    match /referral_redemptions/{refereeUid} {
+      allow get: if isSignedIn() && (request.auth.uid == refereeUid || resource.data.referrerUid == request.auth.uid);
+      allow list: if isSignedIn() && resource.data.referrerUid == request.auth.uid;
+
+      allow create: if isSignedIn() &&
+                       isValidId(refereeUid) &&
+                       request.auth.uid == refereeUid &&
+                       incoming().refereeUid == request.auth.uid &&
+                       incoming().refereeName is string &&
+                       incoming().refereeName.size() >= 1 &&
+                       incoming().refereeName.size() <= 80 &&
+                       incoming().referrerUid is string &&
+                       isValidId(incoming().referrerUid) &&
+                       incoming().referrerUid != request.auth.uid &&
+                       isValidReferralCode(incoming().referralCode) &&
+                       exists(/databases/$(database)/documents/referral_codes/$(incoming().referralCode)) &&
+                       get(/databases/$(database)/documents/referral_codes/$(incoming().referralCode)).data.ownerUid == incoming().referrerUid &&
+                       incoming().rewardPointsReferrer is int &&
+                       incoming().rewardPointsReferrer == 150 &&
+                       incoming().rewardPointsReferee is int &&
+                       incoming().rewardPointsReferee == 100 &&
+                       incoming().keys().hasAll(['refereeUid', 'refereeName', 'referrerUid', 'referralCode', 'rewardPointsReferrer', 'rewardPointsReferee', 'createdAt']) &&
+                       incoming().keys().hasOnly(['refereeUid', 'refereeName', 'referrerUid', 'referralCode', 'rewardPointsReferrer', 'rewardPointsReferee', 'createdAt']) &&
+                       incoming().createdAt is timestamp &&
+                       incoming().createdAt <= request.time;
+
+      allow update, delete: if false;
+    }
+  }
+}

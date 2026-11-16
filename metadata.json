@@ -1,0 +1,6 @@
+{
+  "name": "SalonX",
+  "description": "SalonX luxury salon, spa, and beauty parlour booking app with personalized rituals, master practitioners, and seamless appointments.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Subtle sanctuary halo -->
+    <path
+        android:fillColor="#26FCF9F8"
+        android:pathData="M54,23 A31,31 0 1,0 54,85 A31,31 0 1,0 54,23 Z" />
+    <!-- Center lotus petal -->
+    <path
+        android:fillColor="#FFFCF9F8"
+        android:pathData="M54,28 C61,39 63,53 54,68 C45,53 47,39 54,28 Z" />
+    <!-- Left botanical petal -->
+    <path
+        android:fillColor="#FFE7E2D8"
+        android:pathData="M52,69 C39,65 31,54 31,41 C41,45 48,54 52,69 Z" />
+    <!-- Right botanical petal -->
+    <path
+        android:fillColor="#FFE7E2D8"
+        android:pathData="M56,69 C69,65 77,54 77,41 C67,45 60,54 56,69 Z" />
+    <!-- Lower water ripples / serenity base -->
+    <path
+        android:fillColor="#FFD4AF37"
+        android:pathData="M35,74 C43,72 65,72 73,74 C67,78 41,78 35,74 Z" />
+</vector>
